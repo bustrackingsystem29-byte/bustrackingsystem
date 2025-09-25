@@ -87,9 +87,9 @@ function calculateETA(currentLat, currentLon, destLat, destLon, speed) {
 function getLocalIPAddress() {
   const interfaces = os.networkInterfaces();
   for (const name of Object.keys(interfaces)) {
-    for (const interface of interfaces[name]) {
-      if (interface.family === 'IPv4' && !interface.internal) {
-        return interface.address;
+    for (const netInterface of interfaces[name]) {
+      if (netInterface.family === 'IPv4' && !netInterface.internal) {
+        return netInterface.address;
       }
     }
   }
