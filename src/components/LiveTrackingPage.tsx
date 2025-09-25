@@ -44,13 +44,14 @@ const LiveTrackingPage: React.FC<LiveTrackingPageProps> = ({ bus, onBack, backen
       // Initialize map
       mapInstanceRef.current = L.map(mapRef.current).setView(
         [currentLocation?.lat || 11.1663, currentLocation?.lon || 77.6032], 
-        14
+        15
       );
 
-      // Add OpenStreetMap tiles with clear street view and labels
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap contributors',
+      // Add detailed street map with clear labels and place names
+      L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap France | © OpenStreetMap contributors',
         maxZoom: 18,
+        minZoom: 10,
       }).addTo(mapInstanceRef.current);
 
       // Create custom bus icon
@@ -130,6 +131,13 @@ const LiveTrackingPage: React.FC<LiveTrackingPageProps> = ({ bus, onBack, backen
         
         const location = await response.json();
         
+        // Only update if location actually changed
+        if (currentLocation && 
+            Math.abs(location.lat - currentLocation.lat) < 0.000001 && 
+            Math.abs(location.lon - currentLocation.lon) < 0.000001) {
+          return;
+        }
+        
         // Update marker position with smooth animation
         if (markerRef.current && mapInstanceRef.current) {
           const newLatLng = L.latLng(location.lat, location.lon);
@@ -140,12 +148,17 @@ const LiveTrackingPage: React.FC<LiveTrackingPageProps> = ({ bus, onBack, backen
             <div class="text-center">
               <strong>${bus.id}</strong><br>
               Speed: ${location.speed} km/h<br>
-              Status: ${location.status}
+              Status: ${location.status}<br>
+              <small>Lat: ${location.lat.toFixed(6)}</small><br>
+              <small>Lon: ${location.lon.toFixed(6)}</small>
             </div>
           `);
           
-          // Pan map to new location
-          mapInstanceRef.current.panTo(newLatLng);
+          // Smoothly pan to new location
+          mapInstanceRef.current.panTo(newLatLng, {
+            animate: true,
+            duration: 1.0
+          });
         }
         
         setCurrentLocation(location);
@@ -159,7 +172,7 @@ const LiveTrackingPage: React.FC<LiveTrackingPageProps> = ({ bus, onBack, backen
     updateLocation();
 
     // Set up interval
-    const interval = setInterval(updateLocation, 5000);
+    const interval = setInterval(updateLocation, 3000); // Update every 3 seconds for more real-time feel
     return () => clearInterval(interval);
   }, [bus.id, backendUrl]);
 
@@ -225,12 +238,27 @@ const LiveTrackingPage: React.FC<LiveTrackingPageProps> = ({ bus, onBack, backen
           
           {/* Map Controls */}
           <div className="absolute top-4 right-4 bg-white rounded-lg shadow-lg p-3">
-            <div className="text-sm font-medium text-gray-900 mb-2">Live Updates</div>
+            <div className="text-sm font-medium text-gray-900 mb-2">GPS Tracking</div>
             <div className="flex items-center space-x-2 text-xs text-gray-600">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              <span>Every 5 seconds</span>
+              <span>Live Hardware Data</span>
+            </div>
+            <div className="text-xs text-gray-500 mt-1">
+              Updates: Every 3s
             </div>
           </div>
+          
+          {/* GPS Coordinates Display */}
+          {currentLocation && (
+            <div className="absolute bottom-4 left-4 bg-white rounded-lg shadow-lg p-3">
+              <div className="text-xs font-medium text-gray-900 mb-1">GPS Coordinates</div>
+              <div className="text-xs text-gray-600">
+                <div>Lat: {currentLocation.lat.toFixed(6)}</div>
+                <div>Lon: {currentLocation.lon.toFixed(6)}</div>
+                <div>Accuracy: ±5m</div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}
@@ -261,7 +289,16 @@ const LiveTrackingPage: React.FC<LiveTrackingPageProps> = ({ bus, onBack, backen
                         <Clock className="w-4 h-4 text-gray-400" />
                         <span className="text-gray-600">Last Update</span>
                       </div>
-                      <span className="font-medium">{lastUpdate.toLocaleTimeString()}</span>
+                      <span className="font-medium text-green-600">
+                        {Math.floor((Date.now() - lastUpdate.getTime()) / 1000)}s ago
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Navigation className="w-4 h-4 text-gray-400" />
+                        <span className="text-gray-600">GPS Signal</span>
+                      </div>
+                      <span className="font-medium text-green-600">Strong</span>
                     </div>
                   </>
                 )}

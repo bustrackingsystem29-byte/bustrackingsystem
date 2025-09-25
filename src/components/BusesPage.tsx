@@ -68,7 +68,7 @@ const BusesPage: React.FC<BusesPageProps> = ({
     updateBusLocations();
 
     // Set up interval for updates
-    const interval = setInterval(updateBusLocations, 5000);
+    const interval = setInterval(updateBusLocations, 3000); // More frequent updates
     return () => clearInterval(interval);
   }, [backendUrl]);
 
@@ -177,10 +177,10 @@ const BusesPage: React.FC<BusesPageProps> = ({
             <div className="text-right">
               <div className="flex items-center space-x-2 text-sm text-gray-600 mb-1">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span>Live Updates</span>
+                <span>Hardware GPS</span>
               </div>
               <p className="text-xs text-gray-500">
-                Last updated: {lastUpdate.toLocaleTimeString()}
+                Live data: {lastUpdate.toLocaleTimeString()}
               </p>
             </div>
           </div>

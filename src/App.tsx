@@ -52,13 +52,14 @@ function App() {
     const localIP = window.location.hostname;
     const currentPort = window.location.port;
     
-    console.log('\n🎨 Smart Bus Tracking System - Frontend');
+    console.log('\n🎨 Smart Bus Tracking System - Frontend (Real-time GPS)');
     console.log('=' .repeat(50));
     console.log(`✅ Frontend running at ${window.location.origin}`);
     if (localIP !== 'localhost' && localIP !== '127.0.0.1') {
-      console.log(`🌍 Access from other devices: http://${localIP}:${currentPort || '80'}`);
+      console.log(`🌍 Access from other devices: http://${localIP}:${currentPort || '5173'}`);
     }
-    console.log(`🔗 Backend API: ${detectedUrl}`);
+    console.log(`🔗 Backend API (Hardware GPS): ${detectedUrl}`);
+    console.log(`📡 Hardware should POST to: ${detectedUrl}/api/locations`);
     console.log('=' .repeat(50));
   }, []);
 

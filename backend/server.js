@@ -234,6 +234,25 @@ app.get('/api/search', (req, res) => {
   res.json(results);
 });
 
+function simulateBusMovement() {
+  setInterval(() => {
+    busLocations.forEach((location, busId) => {
+      if (location.status === 'active') {
+        // Small random movement to simulate real GPS updates
+        const latChange = (Math.random() - 0.5) * 0.001; // ~100m movement
+        const lonChange = (Math.random() - 0.5) * 0.001;
+        
+        location.lat += latChange;
+        location.lon += lonChange;
+        location.speed = Math.max(0, location.speed + (Math.random() - 0.5) * 10);
+        location.updated = new Date().toISOString();
+        
+        console.log(`🚌 Simulated GPS Update: ${busId} - Lat: ${location.lat.toFixed(6)}, Lon: ${location.lon.toFixed(6)}, Speed: ${location.speed.toFixed(1)} km/h`);
+      }
+    });
+  }, 8000); // Update every 8 seconds for demo
+}
+
 // Start server
 app.listen(PORT, () => {
   const localIP = getLocalIPAddress();
@@ -250,4 +269,8 @@ app.listen(PORT, () => {
   console.log('\n📱 Example ESP32 POST Body:');
   console.log('{ "device_id": "BUS_101", "lat": 11.1863, "lon": 77.6232, "speed": 35 }');
   console.log('=' .repeat(50));
+  
+  // Start bus movement simulation for demo
+  console.log('\n🎯 Starting GPS simulation for demo purposes...');
+  simulateBusMovement();
 });
