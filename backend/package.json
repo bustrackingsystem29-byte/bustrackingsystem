@@ -1,0 +1,18 @@
+{
+  "name": "bus-tracking-backend",
+  "version": "1.0.0",
+  "description": "Backend server for smart bus tracking system",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@types/leaflet": "^1.9.20",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "helmet": "^7.1.0",
+    "leaflet": "^1.9.4"
+  }
+}
